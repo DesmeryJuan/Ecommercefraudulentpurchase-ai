@@ -1,0 +1,56 @@
+Is Fraudulent: A binary indicator of whether the transaction is fraudulent (1 for fraudulent, 0 for legitimate).
+
+base=read.csv("FraudulentEcommerce.csv")
+library(caret)
+set.seed(123)
+nuevabase <- base[sample(nrow(base), 6000), ]
+base=nuevabase
+str(base)
+base$Transaction.ID=NULL
+base$Customer.ID=NULL
+base$Transaction.Date=NULL
+base$Payment.Method=as.factor(base$Payment.Method)
+str(base)
+base$Product.Category=as.factor(base$Product.Category)
+base$Customer.Location=NULL
+base$Device.Used=as.factor(base$Device.Used)
+base$IP.Adress=NULL
+base$Shipping.Adress=NULL
+base$Billing.Adress=NULL
+set.seed(123);particion=createDataPartition(base$Is.Fraudulent,p=0.8,list=F)
+entreno=base[particion,]
+testeo=base[-particion,]
+library(rpart)
+arbol=rpart(Is.Fraudulent~.,entreno,method="class")
+library(rpart.plot)
+rpart.plot(arbol,extra=1,type=5)
+pred <- factor(pred, levels = c(0, 1))
+testeo$Is.Fraudulent <- factor(testeo$Is.Fraudulent, levels = c(0, 1))
+pred=predict(arbol,testeo,type="class")
+confusionMatrix(pred,testeo$Is.Fraudulent)
+Confusion Matrix and Statistics
+
+          Reference
+Prediction    0    1
+         0 1150     47
+         1    0         3
+                                          
+               Accuracy : 0.9608          
+                 95% CI : (0.9483, 0.9711)
+    No Information Rate : 0.9583          
+    P-Value [Acc > NIR] : 0.3663          
+                                          
+                  Kappa : 0.109           
+                                          
+ Mcnemar's Test P-Value : 1.949e-11       
+                                          
+            Sensitivity : 1.0000          
+            Specificity : 0.0600          
+         Pos Pred Value : 0.9607          
+         Neg Pred Value : 1.0000          
+             Prevalence : 0.9583          
+         Detection Rate : 0.9583          
+   Detection Prevalence : 0.9975          
+      Balanced Accuracy : 0.5300          
+                                          
+       'Positive' Class : 0 
